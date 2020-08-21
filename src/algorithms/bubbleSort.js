@@ -32,6 +32,10 @@ export default async function bubbleSort(array, colorArray, index, callbacks) {
     lastSortedIndex--;
   }
 
+  for (let i = 0; colorArray[i] === "white"; i++) {
+    colorArray[i] = "green";
+  }
+  setColorArray(colorArray);
   setIsSorting(false, index);
   return array;
 }
