@@ -14,7 +14,7 @@ export default async function bubbleSort(array, colorArray, index, callbacks) {
       colorArray[i + 1] = "red";
 
       setColorArray(colorArray);
-      await sleep(delay() / 1);
+      await sleep(delay());
 
       if (array[i] > array[i + 1]) {
         swap(array, i, i + 1);
