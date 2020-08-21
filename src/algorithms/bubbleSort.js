@@ -32,6 +32,6 @@ export default async function bubbleSort(array, colorArray, index, callbacks) {
     lastSortedIndex--;
   }
 
-  setIsSorting(true, index);
+  setIsSorting(false, index);
   return array;
 }
