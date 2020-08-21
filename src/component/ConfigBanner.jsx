@@ -10,8 +10,8 @@ function ConfigBanner(props) {
         onChange={props.onChangeSize}
         defaultValue="100"
         type="range"
-        min="4"
-        max="300"
+        min="8"
+        max="700"
         disabled={props.isSorting}
       ></input>
       <text>Speed: </text>
