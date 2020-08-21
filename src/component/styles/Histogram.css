@@ -1,0 +1,19 @@
+.Histogram {
+  transform: rotate(180deg) scaleX(-1);
+  height: 80%;
+  align-content: center;
+}
+
+ul {
+  list-style: none;
+  overflow: hidden;
+}
+
+li {
+  display: inline;
+}
+
+.Bar {
+  float: left;
+  border: 1px solid black;
+}
