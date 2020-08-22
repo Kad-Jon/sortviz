@@ -12,7 +12,7 @@ function Panel(props) {
         selectedSortType={props.selectedSortType}
         setSortType={props.setSortType}
       ></SortTypeDropDown>
-      <Histogram array={props.array} colorArray={props.colorArray}></Histogram>
+      <ArrayView array={props.array}></ArrayView>
     </div>
   );
 }

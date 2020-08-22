@@ -1,4 +1,4 @@
-import { sleep, swap, colorPair, colorSection } from "../util/sortutil";
+import { sleep, swap } from "../util/sortutil";
 
 export default async function bubbleSort(array, colorArray, index, callbacks) {
   const { setArray, setColorArray, delay, setIsSorting } = callbacks;
