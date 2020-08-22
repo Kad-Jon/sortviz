@@ -4,6 +4,7 @@ import "./styles/Panel.css";
 import SortTypeDropDown from "./SortTypeDropDown";
 
 function Panel(props) {
+
   return (
     <div className="Panel" style={{ height: props.height }}>
       <SortTypeDropDown
@@ -12,7 +13,7 @@ function Panel(props) {
         selectedSortType={props.selectedSortType}
         setSortType={props.setSortType}
       ></SortTypeDropDown>
-      <ArrayView array={props.array}></ArrayView>
+      <Histogram array={props.array} colorArray={props.colorArray} ></Histogram>
     </div>
   );
 }

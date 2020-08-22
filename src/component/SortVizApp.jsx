@@ -3,12 +3,12 @@ import "./styles/SortVizApp.css";
 import "bootstrap/dist/css/bootstrap.css";
 import Panel from "./Panel";
 import ConfigBanner from "./ConfigBanner";
-import { shuffledArray, reverseSortedArray } from "../util/arrayGeneration";
-import bubbleSort from "../algorithms/bubbleSort";
-import quickSort from "../algorithms/quickSort";
-import insertionSort from "../algorithms/insertionSort";
-import mergeSort from "../algorithms/mergeSort";
-import dualPivotQuickSort from "../algorithms/dualPivotQuickSort";
+import { shuffledArray } from "../util/arrayGeneration";
+import ArrayViewController from "./ArrayViewController";
+import bubblesort from "../algorithms/bubble-sort"
+import insertionsort from "../algorithms/insertion-sort";
+import quicksort from "../algorithms/quick-sort"
+import mergesort from "../algorithms/merge-sort";
 
 class SortVizApp extends Component {
   constructor() {
@@ -23,7 +23,7 @@ class SortVizApp extends Component {
           isSorting: false,
         },
       ],
-      delay: 0,
+      delay: 35,
       isSorting: false,
     };
   }
@@ -47,17 +47,21 @@ class SortVizApp extends Component {
   }
 
   createPanels = () => {
+
     const height = 80 / this.state.panels.length + "vh";
     return this.state.panels.map((panel, index) => {
       return (
         <li>
           <Panel
             height={height}
-            selectedSortType={panel.selectedSortType}
-            setSortType={this.setSelectedSortType.bind(this)}
-            key={index}
+
             array={panel.array}
             colorArray={panel.colorArray}
+
+            selectedSortType={panel.selectedSortType}
+            setSortType={this.setSelectedSortType.bind(this)}
+
+            key={index}
             index={index}
           ></Panel>
         </li>
@@ -66,42 +70,66 @@ class SortVizApp extends Component {
   };
 
   onClickSort = () => {
-    this.setState({ isSorting: true });
-    this.setState((state) => ({
-      panels: state.panels.map((panel) => {
-        return { ...panel, isSorting: true };
-      }),
-    }));
-
+    const { panels } = this.state;
     const callbacks = {
+      getDelay: this.getDelay.bind(this),
       setArray: this.setArray.bind(this),
       setColorArray: this.setColorArray.bind(this),
-      delay: this.getDelay.bind(this),
-      setIsSorting: this.setIsSorting.bind(this),
-    };
+    }
 
-    this.state.panels.forEach((panel, index) => {
-      const { array, colorArray, selectedSortType } = panel;
-      switch (selectedSortType) {
+    panels.forEach(async (panel, index) => {
+      const avc = new ArrayViewController(panel.array, panel.colorArray, index, callbacks);
+      switch (panel.selectedSortType) {
         case "bubble":
-          bubbleSort(array, colorArray, index, callbacks);
-          break;
-        case "quick":
-          quickSort(array, colorArray, index, callbacks);
-          break;
-        case "merge":
-          mergeSort(array, colorArray, index, callbacks);
+          await bubblesort(avc);
           break;
         case "insertion":
-          insertionSort(array, colorArray, index, callbacks);
+          await insertionsort(avc);
           break;
-        case "dualpivotquicksort":
-          dualPivotQuickSort(array, colorArray, index, callbacks);
+        case "quick":
+          await quicksort(avc);
+          break;
+        case "merge":
+          await mergesort(avc);
           break;
         default:
           break;
       }
+      avc.sorted();
     });
+  };
+
+  getDelay = () => {
+    return this.state.delay;
+  };
+
+  // Config callback functions to configure the sort
+  onChangeSize = (e) => {
+    const shuffledArr = shuffledArray(e.target.value);
+    const colorArray = Array(parseInt(e.target.value)).fill("white");
+
+    for (let i = 0; i < this.state.panels.length; i++) {
+      this.setColorArray(colorArray.slice(), i);
+      this.setArray(shuffledArr.slice(), i);
+    }
+  };
+
+  onChangeDelay = (e) => {
+    this.setState({ delay: e.target.value });
+  };
+
+  toggleSecondArray = () => {
+    if (this.state.panels.length === 1) {
+      const newPanels = this.state.panels;
+      newPanels.push(this.createDefaultPanelObject());
+      this.setState({
+        panels: newPanels,
+      });
+    } else {
+      const newPanels = this.state.panels;
+      newPanels.pop();
+      this.setState({ panels: newPanels });
+    }
   };
 
   setArray = (array, panelIndex) => {
@@ -140,61 +168,6 @@ class SortVizApp extends Component {
     }));
   };
 
-  setIsSorting = (isSorting, panelIndex) => {
-    this.setState((state) => ({
-      panels: state.panels.map((panel, index) => {
-        if (index === panelIndex) {
-          return { ...panel, isSorting: isSorting };
-        } else {
-          return { ...panel };
-        }
-      }),
-    }));
-
-    let isStillSorting = false;
-
-    this.state.panels.forEach((panel) => {
-      if (panel.isSorting === true) {
-        isStillSorting = true;
-      }
-    });
-
-    this.setState({ isSorting: isStillSorting });
-  };
-
-  getDelay = () => {
-    return this.state.delay;
-  };
-
-  // Config callback functions to configure the sort
-  onChangeSize = (e) => {
-    const shuffledArr = shuffledArray(e.target.value);
-    const colorArray = Array(parseInt(e.target.value)).fill("white");
-
-    for (let i = 0; i < this.state.panels.length; i++) {
-      this.setColorArray(colorArray.slice(), i);
-      this.setArray(shuffledArr.slice(), i);
-    }
-  };
-
-  onChangeDelay = (e) => {
-    this.setState({ delay: e.target.value });
-  };
-
-  toggleSecondArray = () => {
-    if (this.state.panels.length === 1) {
-      const newPanels = this.state.panels;
-      newPanels.push(this.createDefaultPanelObject());
-      this.setState({
-        panels: newPanels,
-      });
-    } else {
-      const newPanels = this.state.panels;
-      newPanels.pop();
-      this.setState({ panels: newPanels });
-    }
-  };
-
   createDefaultPanelObject = () => {
     const baseArray = this.state.panels[0].array.slice();
     return {
@@ -204,6 +177,7 @@ class SortVizApp extends Component {
       isSorting: false,
     };
   };
+
 }
 
 export default SortVizApp;

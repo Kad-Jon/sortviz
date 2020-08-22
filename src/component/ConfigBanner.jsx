@@ -11,17 +11,17 @@ function ConfigBanner(props) {
         defaultValue="100"
         type="range"
         min="8"
-        max="700"
+        max="256"
         disabled={props.isSorting}
       ></input>
       <text>Speed: </text>
       <input
         id="speed-slider"
-        defaultValue="0"
+        defaultValue="35"
         onMouseUp={props.onChangeDelay}
         type="range"
         min="0"
-        max="1000"
+        max="500"
       ></input>
       <button onClick={props.onClickSort} disabled={props.isSorting}>
         Sort
