@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "c7ded94827311d6a289d961cf09c946c",
+    "revision": "a5bdd3b5d4a6735ae8d9f5e3014642a5",
     "url": "/sortviz/index.html"
   },
   {
@@ -8,7 +8,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/sortviz/static/css/2.f3cffc9e.chunk.css"
   },
   {
-    "revision": "601bc316ec4a33b71c55",
+    "revision": "bbb7b32a9f7bd10ee2b2",
     "url": "/sortviz/static/css/main.36add180.chunk.css"
   },
   {
@@ -20,8 +20,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/sortviz/static/js/2.5b36b328.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "601bc316ec4a33b71c55",
-    "url": "/sortviz/static/js/main.c8ab62a9.chunk.js"
+    "revision": "bbb7b32a9f7bd10ee2b2",
+    "url": "/sortviz/static/js/main.0c445408.chunk.js"
   },
   {
     "revision": "9fbe5cb81e290ea22910",
