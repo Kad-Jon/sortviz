@@ -121,7 +121,6 @@ class ArrayViewController {
   }
 
   markSorted(i) {
-    console.log(this.array[i]);
     this.mark(i, "green");
   }
 

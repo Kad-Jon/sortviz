@@ -9,6 +9,7 @@ import bubblesort from "../algorithms/bubble-sort"
 import insertionsort from "../algorithms/insertion-sort";
 import quicksort from "../algorithms/quick-sort"
 import mergesort from "../algorithms/merge-sort";
+import dualpivotquicksort from "../algorithms/dual-pivot-quick-sort";
 
 class SortVizApp extends Component {
   constructor() {
@@ -86,11 +87,14 @@ class SortVizApp extends Component {
         case "insertion":
           await insertionsort(avc);
           break;
+        case "merge":
+          await mergesort(avc);
+          break;
         case "quick":
           await quicksort(avc);
           break;
-        case "merge":
-          await mergesort(avc);
+        case "dualpivotquicksort":
+          await dualpivotquicksort(avc);
           break;
         default:
           break;

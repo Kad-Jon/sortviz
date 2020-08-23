@@ -36,20 +36,8 @@ async function dualPivotQuickSort(array, colorArray, index, callbacks) {
 
     while (curr <= j) {
       await sleep(delay());
-
-      if (array[curr] > lpivot && array[curr] < rpivot) {
-        colorArray[curr] = "purple";
-        setColorArray(colorArray);
-      } else if (array[curr] < lpivot) {
+      if (array[curr] < lpivot) {
         swap(array, curr, i);
-        colorArray[i] = "blue";
-
-        if (array[curr] < rpivot && array[curr] > lpivot) {
-          colorArray[curr] = "purple";
-        }
-
-        setArray(array);
-        setColorArray(colorArray);
         i++;
       } else if (array[curr] >= rpivot) {
         while (array[j] > rpivot && curr < j) {
@@ -74,13 +62,7 @@ async function dualPivotQuickSort(array, colorArray, index, callbacks) {
           setColorArray(colorArray);
           await sleep(delay());
           i++;
-        } else {
-          colorArray[curr] = "purple";
-          setColorArray(colorArray);
         }
-      } else {
-        colorArray[curr] = "purple";
-        setColorArray(colorArray);
       }
       curr++;
     }
