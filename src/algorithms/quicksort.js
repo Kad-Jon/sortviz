@@ -18,19 +18,24 @@ async function partition(arr, start, end) {
   arr.mark(end, "yellow");
 
   // initialize L and R pointers
-  let i = start - 1;
+  let i = start;
   let j = start;
+
+  arr.trackPointer(i, "purple");
 
   // scan for elements smaller than pivot with right pointer and place infront of left pointer, then increment left pointer
   while (j < end) {
     if ((await arr.compareElementToVal(j, pivot)) === -1) {
-      await arr.swap(++i, j);
+      await arr.swap(i++, j);
+      arr.updatePointer(i - 1, i);
     }
     j++;
   }
 
+  arr.untrackPointer(i);
+
   // unmark pivot and swap with final partition boundary
-  arr.unmark(end);
-  await arr.swap(i + 1, end);
-  return i + 1;
+  arr.unmarkAll();
+  await arr.swap(i, end);
+  return i;
 }

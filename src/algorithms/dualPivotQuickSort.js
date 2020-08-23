@@ -1,91 +1,59 @@
-import { swap, sleep, colorPair } from "../util/sortutil";
+export default async function dualpivotquicksort(arr) {
+  await dualPivotQuickSort(arr, 0, arr.getLength() - 1);
+}
 
-async function dualPivotQuickSort(array, colorArray, index, callbacks) {
-  const { setArray, setColorArray, delay, setIsSorting } = callbacks;
-  await dualpivotquicksort(array, 0, array.length - 1);
-  setIsSorting(false, index);
+async function dualPivotQuickSort(arr, start, end) {
+  if (start < end) {
+    const partitions = await partition(arr, start, end);
 
-  async function dualpivotquicksort(array, start, end) {
-    if (start < end) {
-      const pivots = await partition(array, start, end);
-
-      await dualpivotquicksort(array, start, pivots[0] - 1);
-      await dualpivotquicksort(array, pivots[0] + 1, pivots[1] - 1);
-      await dualpivotquicksort(array, pivots[1] + 1, end);
-    } else if (start === end) {
-      colorArray[start] = "green";
-      setColorArray(colorArray);
-      await sleep(delay());
-    }
-  }
-
-  async function partition(array, start, end) {
-    colorPair(colorArray, "yellow", start, end);
-
-    if (array[start] > array[end]) {
-      swap(array, start, end);
-      setArray(array);
-    }
-    let lpivot = array[start];
-    let rpivot = array[end];
-
-    let i = start + 1;
-    let j = end - 1;
-
-    let curr = start + 1;
-
-    while (curr <= j) {
-      await sleep(delay());
-      if (array[curr] < lpivot) {
-        swap(array, curr, i);
-        i++;
-      } else if (array[curr] >= rpivot) {
-        while (array[j] > rpivot && curr < j) {
-          colorArray[j] = "red";
-          setColorArray(colorArray);
-          j--;
-          await sleep(delay());
-        }
-
-        swap(array, curr, j);
-        colorArray[j] = "red";
-        colorArray[curr] = "purple";
-        setArray(array);
-        setColorArray(colorArray);
-        await sleep(delay());
-        j--;
-
-        if (array[curr] < lpivot) {
-          swap(array, curr, i);
-          colorArray[i] = "blue";
-          setArray(array);
-          setColorArray(colorArray);
-          await sleep(delay());
-          i++;
-        }
-      }
-      curr++;
-    }
-    i--;
-    j++;
-
-    swap(array, start, i);
-    swap(array, end, j);
-    colorPair(colorArray, "green", i, j);
-    setArray(array);
-    setColorArray(colorArray);
-    removeColouringInPartition(colorArray, start, end);
-    await sleep(delay());
-    return [i, j];
-  }
-
-  function removeColouringInPartition(colorArray, start, end) {
-    for (let i = start; i <= end; i++) {
-      if (colorArray[i] !== "green") {
-        colorArray[i] = "white";
-      }
-    }
+    await dualPivotQuickSort(arr, start, partitions[0] - 1);
+    await dualPivotQuickSort(arr, partitions[0] + 1, partitions[1] - 1);
+    await dualPivotQuickSort(arr, partitions[1] + 1, end);
   }
 }
 
-export default dualPivotQuickSort;
+async function partition(arr, start, end) {
+  if ((await arr.compare(start, end)) === 1) {
+    await arr.swap(start, end);
+  }
+
+  arr.markPair(start, end, "yellow");
+
+  const lpivot = await arr.get(start);
+  const rpivot = await arr.get(end);
+
+  let i = start + 1;
+  let j = end - 1;
+  let curr = start + 1;
+
+  arr.trackPointer(i, "purple");
+  arr.trackPointer(j, "purple");
+
+  while (curr <= j) {
+    let currVal = await arr.get(curr);
+    if (currVal < lpivot) {
+      await arr.swap(curr, i++);
+      arr.updatePointer(i - 1, i);
+    } else if (currVal >= rpivot) {
+      while ((await arr.compareElementToVal(j, rpivot)) === 1 && curr < j) {
+        j--;
+        arr.updatePointer(j + 1, j);
+      }
+
+      await arr.swap(curr, j--);
+      arr.updatePointer(j + 1, j);
+
+      if ((await arr.compareElementToVal(curr, lpivot)) === -1) {
+        await arr.swap(curr, i++);
+        arr.updatePointer(i - 1, i);
+      }
+    }
+    curr++;
+  }
+  i--;
+  j++;
+  arr.unmarkAll();
+  await arr.swap(start, i);
+  await arr.swap(end, j);
+  return [i, j];
+}

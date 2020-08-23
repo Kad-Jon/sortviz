@@ -1,4 +1,4 @@
-async function insertionsort(arr) {
+export default async function insertionsort(arr) {
   const length = arr.getLength();
 
   for (let i = 1; i < length; i++) {
@@ -11,5 +11,3 @@ async function insertionsort(arr) {
     }
   }
 }
-
-export default insertionsort;

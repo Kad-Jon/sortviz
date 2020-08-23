@@ -2,31 +2,32 @@ import React from "react";
 import "./styles/ConfigBanner.css";
 
 function ConfigBanner(props) {
+  const { initialSize, initialDelay, areSorting, onClickSort, onChangeSize, onChangeDelay, onToggleSecondArray } = props;
   return (
     <div className="ConfigBanner">
       <text>Size: </text>
       <input
         id="size-slider"
-        onChange={props.onChangeSize}
-        defaultValue="100"
+        onChange={onChangeSize}
+        defaultValue={initialSize}
         type="range"
         min="8"
         max="256"
-        disabled={props.isSorting}
+        disabled={areSorting}
       ></input>
       <text>Speed: </text>
       <input
         id="speed-slider"
-        defaultValue="35"
-        onMouseUp={props.onChangeDelay}
+        defaultValue={initialDelay}
+        onMouseUp={onChangeDelay}
         type="range"
         min="0"
         max="500"
       ></input>
-      <button onClick={props.onClickSort} disabled={props.isSorting}>
+      <button onClick={onClickSort} disabled={areSorting}>
         Sort
       </button>
-      <button onClick={props.toggleSecondArray} disabled={props.isSorting}>
+      <button onClick={onToggleSecondArray} disabled={areSorting}>
         Toggle Second Array
       </button>
     </div>

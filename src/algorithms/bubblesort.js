@@ -1,4 +1,4 @@
-async function bubblesort(arr) {
+export default async function bubblesort(arr) {
   let sorted = false;
   let lastSortedIndex = arr.getLength();
 
@@ -14,5 +14,3 @@ async function bubblesort(arr) {
     arr.markSorted(--lastSortedIndex);
   }
 }
-
-export default bubblesort;

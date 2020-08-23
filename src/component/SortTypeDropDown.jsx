@@ -27,8 +27,8 @@ class SortTypeDropDown extends Component {
             Quick
           </option>
           <option
-            value="dualpivotquicksort"
-            selected={"dualpivotquicksort" === selectedSortType}
+            value="dualpivotquick"
+            selected={"dualpivotquick" === selectedSortType}
           >
             Quick (dual pivot)
           </option>
