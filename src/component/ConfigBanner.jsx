@@ -12,7 +12,7 @@ function ConfigBanner(props) {
         defaultValue={initialSize}
         type="range"
         min="8"
-        max="256"
+        max="128"
         disabled={areSorting}
       ></input>
       <text>Speed: </text>

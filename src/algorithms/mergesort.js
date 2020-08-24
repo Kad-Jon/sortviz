@@ -1,5 +1,5 @@
 export default async function mergesort(arr) {
-  await mergeSort(arr, 0, arr.getLength());
+  await mergeSort(arr, 0, arr.length);
 }
 
 async function mergeSort(arr, start, end) {

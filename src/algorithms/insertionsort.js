@@ -1,5 +1,5 @@
 export default async function insertionsort(arr) {
-  const length = arr.getLength();
+  const length = arr.length;
 
   for (let i = 1; i < length; i++) {
     let j = i;

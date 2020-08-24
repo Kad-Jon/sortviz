@@ -1,5 +1,6 @@
+import ArrayPointer from "../module/ArrayPointer";
 export default async function dualpivotquicksort(arr) {
-  await dualPivotQuickSort(arr, 0, arr.getLength() - 1);
+  await dualPivotQuickSort(arr, 0, arr.length - 1);
 }
 
 async function dualPivotQuickSort(arr, start, end) {
@@ -22,38 +23,40 @@ async function partition(arr, start, end) {
   const lpivot = await arr.get(start);
   const rpivot = await arr.get(end);
 
-  let i = start + 1;
-  let j = end - 1;
-  let curr = start + 1;
+  let i = new ArrayPointer(start + 1);
+  let j = new ArrayPointer(end - 1);
+  let curr = new ArrayPointer(start + 1);
 
-  arr.trackPointer(i, "purple");
-  arr.trackPointer(j, "purple");
+  arr.trackPointer(i, "green");
+  arr.trackPointer(j, "green");
 
   while (curr <= j) {
     let currVal = await arr.get(curr);
     if (currVal < lpivot) {
-      await arr.swap(curr, i++);
-      arr.updatePointer(i - 1, i);
+      await arr.swap(curr, i);
+      i.increment();
     } else if (currVal >= rpivot) {
-      while ((await arr.compareElementToVal(j, rpivot)) === 1 && curr < j) {
-        j--;
-        arr.updatePointer(j + 1, j);
+      while ((await arr.compareToVal(j, rpivot)) === 1 && curr < j) {
+        j.decrement();
       }
 
-      await arr.swap(curr, j--);
-      arr.updatePointer(j + 1, j);
+      await arr.swap(curr, j);
+      j.decrement();
 
-      if ((await arr.compareElementToVal(curr, lpivot)) === -1) {
-        await arr.swap(curr, i++);
-        arr.updatePointer(i - 1, i);
+      if ((await arr.compareToVal(curr, lpivot)) === -1) {
+        await arr.swap(curr, i);
+        i.increment();
       }
     }
-    curr++;
+    curr.increment();
   }
-  i--;
-  j++;
-  arr.unmarkAll();
-  await arr.swap(start, i);
-  await arr.swap(end, j);
+
+  i.decrement();
+  j.increment();
+
+  arr.untrackPointers(i, j);
+  arr.unmarkPair(start, end);
+  await arr.swap(start, i, "yellow");
+  await arr.swap(end, j, "yellow");
   return [i, j];
 }

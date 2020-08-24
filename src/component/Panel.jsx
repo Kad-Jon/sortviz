@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import Histogram from "./Histogram";
 import "./styles/Panel.css";
 import SortTypeDropDown from "./SortTypeDropDown";
@@ -14,6 +14,7 @@ function Panel(props) {
         setSortType={props.setSortType}
       ></SortTypeDropDown>
       <Histogram array={props.array} colorArray={props.colorArray} ></Histogram>
+      <text>{props.arrayAccesses}</text>
     </div>
   );
 }

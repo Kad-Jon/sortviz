@@ -10,63 +10,10 @@ class ArrayViewController {
     this.setArray = callbacks.setArray;
     this.setColorArray = callbacks.setColorArray;
     this.setIsSorting = callbacks.setIsSorting;
+    this.setArrayAccesses = callbacks.setArrayAccesses;
 
-    this.trackArray = Array(array.length).fill(false);
-  }
-
-  // Getters
-
-  getArray() {
-    return this.array;
-  }
-
-  getColorArray() {
-    return this.colorArray;
-  }
-
-  getLength() {
-    return this.array.length;
-  }
-
-  async get(i, color = "red") {
-    const prevColor = this.colorArray[i];
-    this.mark(i, color);
-    await this.delay();
-    this.mark(i, prevColor);
-    return this.array[i];
-  }
-
-  async compare(i, j, color = "red") {
-    this.markPair(i, j, color);
-    await this.delay(2);
-    this.unmarkPair(i, j);
-
-    const leftVal = this.array[i];
-    const rightVal = this.array[j];
-
-    if (leftVal === rightVal) {
-      return 0;
-    } else if (leftVal > rightVal) {
-      return 1;
-    } else {
-      return -1;
-    }
-  }
-
-  async compareElementToVal(i, val, color = "red") {
-    const prevColor = this.colorArray[i];
-    this.mark(i, color);
-    await this.delay();
-    this.mark(i, prevColor);
-    const elementVal = this.array[i];
-
-    if (elementVal === val) {
-      return 0;
-    } else if (elementVal > val) {
-      return 1;
-    } else {
-      return -1;
-    }
+    this.pointers = [];
+    this.arrayAccesses = 0;
   }
 
   // delay to be applied to async array manipulations
@@ -74,43 +21,83 @@ class ArrayViewController {
     await sleep(this.getDelay() * multiplier);
   }
 
-  // Array manipulations. Each array read and write are delayed by one unit
+  // Animated array manipulations. Each array read and write are delayed by one unit and
+  // highlighted with tracked elements are refreshed before and after any manipulation
+
+  async get(i, color = "red") {
+    const { array, colorArray, setArrayAccesses, index } = this;
+    let { arrayAccesses } = this;
+
+    this.colorTrackedPointers();
+
+    const prevColor = colorArray[i];
+    this.mark(i, color);
+    await this.delay();
+    this.mark(i, prevColor);
+
+    setArrayAccesses(++arrayAccesses, index);
+    this.arrayAccesses = arrayAccesses;
+
+    return array[i];
+  }
+
+  async compare(i, j, color = "red") {
+    this.markPair(i, j, color);
+    const leftVal = await this.get(i, color);
+    const rightVal = await this.get(j, color);
+    this.unmarkPair(i, j);
+    return this.compareVals(leftVal, rightVal);
+  }
+
+  async compareToVal(i, val, color = "red") {
+    const elementVal = await this.get(i, color);
+    return this.compareVals(elementVal, val);
+  }
+
+  compareVals(valOne, valTwo) {
+    const lessThan = -1;
+    const equal = 0;
+    const moreThan = 1;
+
+    if (valOne > valTwo) return moreThan;
+    if (valOne < valTwo) return lessThan;
+    return equal;
+  }
+
   async set(i, val, color = "red") {
-    const { array, colorArray, setArray, index } = this;
+    const { array, setArray, colorArray, index, setArrayAccesses } = this;
+    let { arrayAccesses } = this;
+
+    this.colorTrackedPointers();
+
     const prevColor = colorArray[i];
     this.mark(i, color);
     array[i] = val;
     setArray(array, index);
     await this.delay();
     this.mark(i, prevColor);
+
+    setArrayAccesses(++arrayAccesses, index);
+    this.arrayAccesses = arrayAccesses;
   }
 
   async swap(i, j, color = "blue") {
     if (i === j) return;
-    const { array, colorArray, setArray, index } = this;
+    const { colorArray } = this;
+
+    this.colorTrackedPointers();
 
     const iprev = colorArray[i];
     const jprev = colorArray[j];
-
     this.markPair(i, j, color);
 
-    let tmp = array[i];
-    await this.delay();
-    array[i] = array[j];
-    setArray(array, index);
-    await this.delay(2);
-    array[j] = tmp;
-    setArray(array, index);
-    await this.delay();
+    const tmp = await this.get(i, color);
+    const jVal = await this.get(j, color);
+    await this.set(i, jVal, color);
+    await this.set(j, tmp, color);
 
     this.mark(i, iprev);
     this.mark(j, jprev);
-
-    const tArr = this.trackArray;
-    if (tArr[i] || tArr[j]) {
-      this.swapColors(i, j);
-      this.swapTracking(i, j);
-    }
   }
 
   // Array color manipulations. These operations are not delayed
@@ -125,74 +112,6 @@ class ArrayViewController {
     this.mark(j, color);
   }
 
-  unmarkPair(i, j) {
-    this.mark(i, "white");
-    this.mark(j, "white");
-  }
-
-  markSorted(i) {
-    this.mark(i, "green");
-  }
-
-  unmark(i) {
-    this.mark(i, "white");
-  }
-
-  track(i, color) {
-    this.trackArray[i] = true;
-    this.mark(i, color);
-  }
-
-  untrack(i) {
-    this.trackArray[i] = false;
-    this.unmark(i);
-  }
-
-  swapColors(i, j) {
-    const cArr = this.colorArray;
-    const tmp = cArr[i];
-    cArr[i] = cArr[j];
-    cArr[j] = tmp;
-    this.setColorArray(cArr, this.index);
-  }
-
-  swapTracking(i, j) {
-    const tArr = this.trackArray;
-    const tmp = tArr[i];
-    tArr[i] = tArr[j];
-    tArr[j] = tmp;
-  }
-
-  trackPointer(i, color) {
-    this.mark(i, color);
-  }
-
-  updatePointer(oldIndex, newIndex) {
-    this.swapColors(oldIndex, newIndex);
-  }
-
-  untrackPointer(i) {
-    this.unmark(i);
-  }
-
-  unmarkAll() {
-    const { colorArray, setColorArray, length, index } = this;
-    for (let i = 0; i < length; i++) {
-      colorArray[i] = "white";
-    }
-    setColorArray(colorArray, index);
-  }
-
-  unmarkAllNonSorted() {
-    const { colorArray, setColorArray, length, index } = this;
-    for (let i = 0; i < length; i++) {
-      if (colorArray[i] != "green") {
-        colorArray[i] = "white";
-      }
-    }
-    setColorArray(colorArray, index);
-  }
-
   markSection(begin, end, color) {
     const colorArray = this.colorArray;
     for (let i = begin; i <= end; i++) {
@@ -200,6 +119,71 @@ class ArrayViewController {
     }
 
     this.setColorArray(colorArray, this.index);
+  }
+
+  markAll(color) {
+    const { colorArray, setColorArray, length, index } = this;
+    for (let i = 0; i < length; i++) {
+      colorArray[i] = color;
+    }
+    setColorArray(colorArray, index);
+  }
+
+  unmark(i) {
+    this.mark(i, "white");
+  }
+
+  unmarkPair(i, j) {
+    this.mark(i, "white");
+    this.mark(j, "white");
+  }
+
+  unmarkSection(begin, end) {
+    this.markSection(begin, end, "white");
+  }
+
+  unmarkAll() {
+    this.markAll("white");
+  }
+
+  trackPointer(pointer, color) {
+    pointer.setColor(color);
+    this.pointers.push(pointer);
+    this.mark(pointer, color);
+  }
+
+  untrackPointer(pointer) {
+    const pointers = this.pointers;
+    this.unmark(pointer);
+    this.unmark(pointer.prev);
+    pointers.splice(pointers.indexOf(pointer, 1));
+  }
+
+  untrackPointers(...pointers) {
+    pointers.forEach((pointer) => this.untrackPointer(pointer));
+  }
+
+  untrackAllPointers() {
+    this.colorTrackedPointers();
+    const { pointers, colorArray, setColorArray } = this;
+
+    for (let i = pointers.length - 1; i > -1; i--) {
+      colorArray[pointers[i]] = "white";
+      pointers.pop();
+    }
+
+    setColorArray(colorArray);
+  }
+
+  colorTrackedPointers() {
+    const { pointers, colorArray, setColorArray } = this;
+
+    pointers.forEach((pointer) => {
+      colorArray[pointer] = pointer.color;
+      if (pointer.prev !== -1) colorArray[pointer.prev] = "white";
+    });
+
+    setColorArray(colorArray);
   }
 
   async sorted() {

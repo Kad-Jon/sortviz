@@ -1,6 +1,6 @@
 export default async function bubblesort(arr) {
   let sorted = false;
-  let lastSortedIndex = arr.getLength();
+  let lastSortedIndex = arr.length;
 
   while (!sorted) {
     sorted = true;
@@ -11,6 +11,6 @@ export default async function bubblesort(arr) {
         sorted = false;
       }
     }
-    arr.markSorted(--lastSortedIndex);
+    lastSortedIndex--;
   }
 }

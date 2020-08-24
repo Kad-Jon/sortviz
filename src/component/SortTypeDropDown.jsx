@@ -20,6 +20,9 @@ class SortTypeDropDown extends Component {
           <option value="insertion" selected={"insertion" === selectedSortType}>
             Insertion
           </option>
+          <option value="selection" selected={"selection" === selectedSortType}>
+            Selection
+          </option>
           <option value="merge" selected={"merge" === selectedSortType}>
             Merge
           </option>

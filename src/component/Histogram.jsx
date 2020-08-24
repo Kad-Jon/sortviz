@@ -1,4 +1,4 @@
-import React, { Component, PureComponent } from "react";
+import React, { Component } from "react";
 import "bootstrap/dist/css/bootstrap.css";
 import "./styles/Histogram.css";
 
@@ -36,7 +36,7 @@ class Histogram extends Component {
 
 class Bar extends Component {
   shouldComponentUpdate(nextProps, nextState) {
-    if (this.props.styles != nextProps.styles) {
+    if (this.props.styles !== nextProps.styles) {
       return false;
     }
   }

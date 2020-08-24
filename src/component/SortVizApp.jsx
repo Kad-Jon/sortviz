@@ -10,11 +10,12 @@ import insertionsort from "../algorithms/insertionsort";
 import quicksort from "../algorithms/quicksort"
 import mergesort from "../algorithms/mergesort";
 import dualpivotquicksort from "../algorithms/dualpivotquicksort";
+import selectionsort from "../algorithms/selectionsort";
 
 class SortVizApp extends Component {
   constructor() {
     super();
-    const initialSize = 100;
+    const initialSize = 64;
     const initialDelay = 35;
     this.state = {
       initialSize: initialSize,
@@ -27,6 +28,8 @@ class SortVizApp extends Component {
           colorArray: Array(initialSize).fill("white"),
           selectedSortType: "bubble",
           isSorting: false,
+          arrayAccesses: 0,
+          size: initialSize,
         },
       ],
     };
@@ -70,6 +73,7 @@ class SortVizApp extends Component {
             array={arrayview.array}
             colorArray={arrayview.colorArray}
             selectedSortType={arrayview.selectedSortType}
+            arrayAccesses={arrayview.arrayAccesses}
             setSortType={setSelectedSortType}
           ></Panel>
         </li>
@@ -83,6 +87,7 @@ class SortVizApp extends Component {
       getDelay: this.getDelay.bind(this),
       setArray: this.setArray.bind(this),
       setColorArray: this.setColorArray.bind(this),
+      setArrayAccesses: this.setArrayAccesses.bind(this),
       setIsSorting: this.setIsSorting.bind(this),
     }
 
@@ -97,6 +102,9 @@ class SortVizApp extends Component {
           break;
         case "insertion":
           await insertionsort(avc);
+          break;
+        case "selection":
+          await selectionsort(avc);
           break;
         case "merge":
           await mergesort(avc);
@@ -176,6 +184,18 @@ class SortVizApp extends Component {
       arrayviews: state.arrayviews.map((arrayview, index) => {
         if (index === viewIndex) {
           return { ...arrayview, selectedSortType: sortType };
+        } else {
+          return { ...arrayview };
+        }
+      }),
+    }));
+  };
+
+  setArrayAccesses = (arrayAccesses, viewIndex) => {
+    this.setState((state) => ({
+      arrayviews: state.arrayviews.map((arrayview, index) => {
+        if (index === viewIndex) {
+          return { ...arrayview, arrayAccesses: arrayAccesses };
         } else {
           return { ...arrayview };
         }

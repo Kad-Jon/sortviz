@@ -1,5 +1,7 @@
+import ArrayPointer from "../module/ArrayPointer";
+
 export default async function quicksort(arr) {
-  await quickSort(arr, 0, arr.getLength() - 1);
+  await quickSort(arr, 0, arr.length - 1);
 }
 
 async function quickSort(arr, start, end) {
@@ -18,18 +20,18 @@ async function partition(arr, start, end) {
   arr.mark(end, "yellow");
 
   // initialize L and R pointers
-  let i = start;
-  let j = start;
+  let i = new ArrayPointer(start);
+  let j = new ArrayPointer(start);
 
-  arr.trackPointer(i, "purple");
+  arr.trackPointer(i, "green");
 
   // scan for elements smaller than pivot with right pointer and place infront of left pointer, then increment left pointer
   while (j < end) {
-    if ((await arr.compareElementToVal(j, pivot)) === -1) {
-      await arr.swap(i++, j);
-      arr.updatePointer(i - 1, i);
+    if ((await arr.compareToVal(j, pivot)) === -1) {
+      await arr.swap(i, j);
+      i.increment();
     }
-    j++;
+    j.increment();
   }
 
   arr.untrackPointer(i);
