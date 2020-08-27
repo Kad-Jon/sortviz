@@ -1,7 +1,12 @@
 import ArrayPointer from "../module/ArrayPointer";
 
-export default async function quicksort(arr) {
-  await quickSort(arr, 0, arr.length - 1);
+export default async function quicksort(arr) 
+
+
+
+
+	{
+                                       await quickSort(arr, 0, arr.length - 1);
 }
 
 async function quickSort(arr, start, end) {

@@ -3,11 +3,11 @@ import "./styles/SortVizApp.css";
 import "bootstrap/dist/css/bootstrap.css";
 import Panel from "./Panel";
 import ConfigBanner from "./ConfigBanner";
-import { shuffledArray } from "../util/arrayGeneration";
+import { randomArray } from "../util/arrayGeneration";
 import ArrayViewController from "../module/ArrayViewController";
-import bubblesort from "../algorithms/bubblesort"
+import bubblesort from "../algorithms/bubblesort";
 import insertionsort from "../algorithms/insertionsort";
-import quicksort from "../algorithms/quicksort"
+import quicksort from "../algorithms/quicksort";
 import mergesort from "../algorithms/mergesort";
 import dualpivotquicksort from "../algorithms/dualpivotquicksort";
 import selectionsort from "../algorithms/selectionsort";
@@ -17,41 +17,48 @@ class SortVizApp extends Component {
     super();
     const initialSize = 64;
     const initialDelay = 35;
+    const initialArray = randomArray(initialSize);
+    const initialColorArray = Array(initialSize).fill("white");
+    const initialSelectedSortType = "bubble";
+    const initialMaxVal = Math.max(...initialArray);
     this.state = {
-      initialSize: initialSize,
-      initialDelay: initialDelay,
       delay: initialDelay,
       areSorting: false,
       arrayviews: [
         {
-          array: shuffledArray(initialSize),
-          colorArray: Array(initialSize).fill("white"),
-          selectedSortType: "bubble",
+          array: initialArray,
+          colorArray: initialColorArray,
+          selectedSortType: initialSelectedSortType,
           isSorting: false,
           arrayAccesses: 0,
-          size: initialSize,
+          maxVal: initialMaxVal,
         },
       ],
     };
   }
 
   render() {
-    const { onClickSort, onChangeSize, onChangeDelay, onToggleSecondArray } = this;
+    const {
+      onClickSort,
+      onChangeSize,
+      onChangeDelay,
+      onToggleSecondArray,
+    } = this;
     const { initialSize, initialDelay, areSorting } = this.state;
 
     return (
-      <div className="SortVizApp container-fluid">
+      <div className="SortVizApp container">
         <div id="title" className="page-header">
           <h1>Sorting Algorithm Visualizer</h1>
         </div>
         <ConfigBanner
-          initialSize={initialSize}
-          initialDelay={initialDelay}
+          initialSize={64}
+          initialDelay={35}
           areSorting={areSorting}
-          onClickSort={onClickSort.bind(this)}
-          onChangeSize={onChangeSize.bind(this)}
-          onChangeDelay={onChangeDelay.bind(this)}
-          onToggleSecondArray={onToggleSecondArray.bind(this)}
+          onClickSort={onClickSort}
+          onChangeSize={onChangeSize}
+          onChangeDelay={onChangeDelay}
+          onToggleSecondArray={onToggleSecondArray}
         ></ConfigBanner>
         <ul>{this.createPanels()}</ul>
       </div>
@@ -84,17 +91,22 @@ class SortVizApp extends Component {
   onClickSort = async () => {
     const { arrayviews } = this.state;
     const callbacks = {
-      getDelay: this.getDelay.bind(this),
-      setArray: this.setArray.bind(this),
-      setColorArray: this.setColorArray.bind(this),
-      setArrayAccesses: this.setArrayAccesses.bind(this),
-      setIsSorting: this.setIsSorting.bind(this),
-    }
+      getDelay: this.getDelay,
+      setArray: this.setArray,
+      setColorArray: this.setColorArray,
+      setArrayAccesses: this.setArrayAccesses,
+      setIsSorting: this.setIsSorting,
+    };
 
     this.setState({ areSorting: true });
 
     arrayviews.forEach(async (arrayview, index) => {
-      const avc = new ArrayViewController(arrayview.array, arrayview.colorArray, index, callbacks);
+      const avc = new ArrayViewController(
+        arrayview.array,
+        arrayview.colorArray,
+        index,
+        callbacks
+      );
       // this.setIsSorting(true, index);
       switch (arrayview.selectedSortType) {
         case "bubble":
@@ -128,12 +140,15 @@ class SortVizApp extends Component {
 
   // Config callback functions to configure the sort
   onChangeSize = (e) => {
-    const shuffledArr = shuffledArray(e.target.value);
+    const shuffledArr = randomArray(e.target.value, 3);
     const colorArray = Array(parseInt(e.target.value)).fill("white");
+
+    this.setState({ size: e.target.value });
 
     for (let i = 0; i < this.state.arrayviews.length; i++) {
       this.setColorArray(colorArray.slice(), i);
       this.setArray(shuffledArr.slice(), i);
+      this.setArrayAccesses(0, i);
     }
   };
 
@@ -226,15 +241,15 @@ class SortVizApp extends Component {
   };
 
   createDefaultPanelObject = () => {
-    const baseArray = this.state.arrayviews[0].array.slice();
+    const basearrayview = this.state.arrayviews[0];
     return {
-      array: baseArray,
-      colorArray: Array(baseArray.length).fill("white"),
-      selectedSortType: "bubble",
+      array: basearrayview.array.slice(),
+      colorArray: basearrayview.colorArray.slice(),
+      selectedSortType: basearrayview.selectedSortType,
       isSorting: false,
+      arrayAccesses: 0,
     };
   };
-
 }
 
 export default SortVizApp;

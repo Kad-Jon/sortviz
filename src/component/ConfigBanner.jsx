@@ -2,7 +2,15 @@ import React from "react";
 import "./styles/ConfigBanner.css";
 
 function ConfigBanner(props) {
-  const { initialSize, initialDelay, areSorting, onClickSort, onChangeSize, onChangeDelay, onToggleSecondArray } = props;
+  const {
+    initialSize,
+    initialDelay,
+    areSorting,
+    onClickSort,
+    onChangeSize,
+    onChangeDelay,
+    onToggleSecondArray,
+  } = props;
   return (
     <div className="ConfigBanner">
       <text>Size: </text>
@@ -15,6 +23,7 @@ function ConfigBanner(props) {
         max="128"
         disabled={areSorting}
       ></input>
+      <button>Generate</button>
       <text>Speed: </text>
       <input
         id="speed-slider"

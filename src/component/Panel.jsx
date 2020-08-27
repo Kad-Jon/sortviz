@@ -14,7 +14,7 @@ function Panel(props) {
         setSortType={props.setSortType}
       ></SortTypeDropDown>
       <Histogram array={props.array} colorArray={props.colorArray} ></Histogram>
-      <text>{props.arrayAccesses}</text>
+      <text hidden={props.arrayAccesses === 0}>Array Accesses: {props.arrayAccesses}</text>
     </div>
   );
 }

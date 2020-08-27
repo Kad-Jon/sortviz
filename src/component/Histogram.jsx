@@ -13,9 +13,9 @@ class Histogram extends Component {
 
   createBarList = (array, colorArray) => {
     const width = 100 / array.length;
-    const length = array.length;
+    const maxHeight = Math.max(...array);
     return array.map((element, index) => {
-      return this.createBar(element / length, colorArray[index], width, index);
+      return this.createBar(element / maxHeight, colorArray[index], width, index);
     });
   };
 

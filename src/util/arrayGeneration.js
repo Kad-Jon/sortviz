@@ -1,28 +1,42 @@
-function shuffledArray(size) {
-  let arr = [];
+export function randomArray(size) {
+  const arr = [];
+  for (let i = 0; i < size; i++) {
+    arr.push(Math.floor(Math.random() * (size - 1)));
+  }
+  return arr;
+}
+
+export function linearArray(size) {
+  const arr = [];
+  for (let i = 1; i <= size; i++) {
+    arr.push(i);
+  }
+  return arr;
+}
+
+export function polynomialArray(size, degree) {
+  const arr = [];
 
   for (let i = 0; i < size; i++) {
-    arr.push(i);
+    arr.push(Math.pow(i, degree));
   }
-
-  for (let i = arr.length - 1; i > 0; i--) {
-    let tmp = arr[i];
-    let j = Math.floor(Math.random() * i);
-    arr[i] = arr[j];
-    arr[j] = tmp;
-  }
-
   return arr;
 }
 
-function reverseSortedArray(size) {
+export function zeroCentredPolynomialArray(size, degree) {
   let arr = [];
 
-  for (let i = size - 1; i >= 0; i--) {
-    arr.push(i);
+  const lo = -Math.floor(size / 2);
+  const hi = Math.ceil(size / 2);
+
+  for (let i = lo; i < hi; i++) {
+    arr.push(Math.pow(i, degree));
+  }
+
+  if (degree % 2 !== 0) {
+    const translation = Math.pow(Math.ceil(size / 2), degree);
+    arr = arr.map((element) => element + translation);
   }
 
   return arr;
 }
-
-export { shuffledArray, reverseSortedArray };

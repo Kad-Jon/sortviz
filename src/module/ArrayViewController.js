@@ -41,20 +41,20 @@ class ArrayViewController {
     return array[i];
   }
 
-  async compare(i, j, color = "red") {
+  compare = async (i, j, color = "red") => {
     this.markPair(i, j, color);
     const leftVal = await this.get(i, color);
     const rightVal = await this.get(j, color);
     this.unmarkPair(i, j);
     return this.compareVals(leftVal, rightVal);
-  }
+  };
 
-  async compareToVal(i, val, color = "red") {
+  compareToVal = async (i, val, color = "red") => {
     const elementVal = await this.get(i, color);
     return this.compareVals(elementVal, val);
-  }
+  };
 
-  compareVals(valOne, valTwo) {
+  compareVals = async (valOne, valTwo) => {
     const lessThan = -1;
     const equal = 0;
     const moreThan = 1;
@@ -62,9 +62,9 @@ class ArrayViewController {
     if (valOne > valTwo) return moreThan;
     if (valOne < valTwo) return lessThan;
     return equal;
-  }
+  };
 
-  async set(i, val, color = "red") {
+  set = async (i, val, color = "red") => {
     const { array, setArray, colorArray, index, setArrayAccesses } = this;
     let { arrayAccesses } = this;
 
@@ -79,9 +79,9 @@ class ArrayViewController {
 
     setArrayAccesses(++arrayAccesses, index);
     this.arrayAccesses = arrayAccesses;
-  }
+  };
 
-  async swap(i, j, color = "blue") {
+  swap = async (i, j, color = "blue") => {
     if (i === j) return;
     const { colorArray } = this;
 
@@ -98,72 +98,72 @@ class ArrayViewController {
 
     this.mark(i, iprev);
     this.mark(j, jprev);
-  }
+  };
 
   // Array color manipulations. These operations are not delayed
-  mark(i, color = "red") {
+  mark = (i, color = "red") => {
     const { colorArray, setColorArray, index } = this;
     colorArray[i] = color;
     setColorArray(colorArray, index);
-  }
+  };
 
-  markPair(i, j, color = "red") {
+  markPair = (i, j, color = "red") => {
     this.mark(i, color);
     this.mark(j, color);
-  }
+  };
 
-  markSection(begin, end, color) {
+  markSection = (begin, end, color) => {
     const colorArray = this.colorArray;
     for (let i = begin; i <= end; i++) {
       colorArray[i] = color;
     }
 
     this.setColorArray(colorArray, this.index);
-  }
+  };
 
-  markAll(color) {
+  markAll = (color) => {
     const { colorArray, setColorArray, length, index } = this;
     for (let i = 0; i < length; i++) {
       colorArray[i] = color;
     }
     setColorArray(colorArray, index);
-  }
+  };
 
-  unmark(i) {
+  unmark = (i) => {
     this.mark(i, "white");
-  }
+  };
 
-  unmarkPair(i, j) {
+  unmarkPair = (i, j) => {
     this.mark(i, "white");
     this.mark(j, "white");
-  }
+  };
 
-  unmarkSection(begin, end) {
+  unmarkSection = (begin, end) => {
     this.markSection(begin, end, "white");
-  }
+  };
 
-  unmarkAll() {
+  unmarkAll = () => {
     this.markAll("white");
-  }
+  };
 
-  trackPointer(pointer, color) {
+  trackPointer = (pointer, color) => {
     pointer.setColor(color);
     this.pointers.push(pointer);
     this.mark(pointer, color);
-  }
+  };
 
-  untrackPointer(pointer) {
+  untrackPointer = (pointer) => {
     const pointers = this.pointers;
     this.unmark(pointer);
     this.unmark(pointer.prev);
     pointers.splice(pointers.indexOf(pointer, 1));
-  }
+  };
 
-  untrackPointers(...pointers) {
+  untrackPointers = (...pointers) => {
     pointers.forEach((pointer) => this.untrackPointer(pointer));
-  }
+  };
 
-  untrackAllPointers() {
+  untrackAllPointers = () => {
     this.colorTrackedPointers();
     const { pointers, colorArray, setColorArray } = this;
 
@@ -173,9 +173,9 @@ class ArrayViewController {
     }
 
     setColorArray(colorArray);
-  }
+  };
 
-  colorTrackedPointers() {
+  colorTrackedPointers = () => {
     const { pointers, colorArray, setColorArray } = this;
 
     pointers.forEach((pointer) => {
@@ -184,9 +184,9 @@ class ArrayViewController {
     });
 
     setColorArray(colorArray);
-  }
+  };
 
-  async sorted() {
+  sorted = async () => {
     for (let i = 0; i < 3; i++) {
       this.markSection(0, this.array.length - 1, "green");
       await sleep(250);
@@ -194,7 +194,7 @@ class ArrayViewController {
       await sleep(250);
     }
     this.setIsSorting(false, this.index);
-  }
+  };
 }
 
 export default ArrayViewController;
