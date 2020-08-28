@@ -1,28 +1,64 @@
-function shuffledArray(size) {
-  let arr = [];
-
-  for (let i = 0; i < size; i++) {
-    arr.push(i);
-  }
-
-  for (let i = arr.length - 1; i > 0; i--) {
-    let tmp = arr[i];
-    let j = Math.floor(Math.random() * i);
-    arr[i] = arr[j];
-    arr[j] = tmp;
-  }
-
-  return arr;
+const randomArray = (size) => {
+    const arr = []
+    for (let i = 0; i < size; i++) {
+        arr.push(Math.floor(Math.random() * (size - 1)))
+    }
+    return arr
 }
 
-function reverseSortedArray(size) {
-  let arr = [];
-
-  for (let i = size - 1; i >= 0; i--) {
-    arr.push(i);
-  }
-
-  return arr;
+const linearArray = (size) => {
+    const arr = []
+    for (let i = 1; i <= size; i++) {
+        arr.push(i)
+    }
+    return arr
 }
 
-export { shuffledArray, reverseSortedArray };
+const polynomialArray = (size, degree) => {
+    const arr = []
+
+    for (let i = 0; i < size; i++) {
+        arr.push(Math.pow(i, degree))
+    }
+    return arr
+}
+
+const zeroCentredPolynomialArray = (size, degree) => {
+    let arr = []
+
+    const lo = -Math.floor(size / 2)
+    const hi = Math.ceil(size / 2)
+
+    for (let i = lo; i < hi; i++) {
+        arr.push(Math.pow(i, degree))
+    }
+
+    if (degree % 2 !== 0) {
+        const translation = Math.pow(Math.ceil(size / 2), degree)
+        arr = arr.map((element) => element + translation)
+    }
+
+    return arr
+}
+
+const quadraticArray = (size) => {
+    return zeroCentredPolynomialArray(size, 2)
+}
+
+const cubicArray = (size) => {
+    return zeroCentredPolynomialArray(size, 3)
+}
+
+const quinticArray = (size) => {
+    return zeroCentredPolynomialArray(size, 5)
+}
+
+const arrayGenerators = {
+    linear: linearArray,
+    random: randomArray,
+    quadratic: quadraticArray,
+    cubic: cubicArray,
+    quintic: quinticArray,
+}
+
+export default arrayGenerators

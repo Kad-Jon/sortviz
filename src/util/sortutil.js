@@ -1,20 +1,12 @@
 export function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export function swap(arr, i, j) {
-  let tmp = arr[i];
-  arr[i] = arr[j];
-  arr[j] = tmp;
-}
-
-export function colorPair(colArr, col, i, j) {
-  colArr[i] = col;
-  colArr[j] = col;
-}
-
-export function colorSection(colArr, col, firstIndex, lastIndex) {
-  for (let i = firstIndex; i <= lastIndex; i++) {
-    colArr[i] = col;
-  }
+export function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        let tmp = array[i];
+        let j = Math.floor(Math.random() * i);
+        array[i] = array[j];
+        array[j] = tmp;
+    }
 }

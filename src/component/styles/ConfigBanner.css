@@ -6,19 +6,15 @@
 input {
   margin-left: 20px;
   vertical-align: middle;
-  display: inline-block;
 }
 
-button {
-  margin-top: 10px;
-  text-align: right;
-  display: inline-block;
-  vertical-align: bottom;
+button { 
   margin-left: 20px;
 }
 
+
 #speed-slider {
-  direction: rtl;
+  direction: rtl;  
 }
 
 form {
@@ -30,6 +26,5 @@ form {
 text {
   color: white;
   font: bold;
-  vertical-align: bottom;
   margin-left: 10px;
 }
