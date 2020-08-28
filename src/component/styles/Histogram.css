@@ -2,6 +2,7 @@
   transform: rotate(180deg) scaleX(-1);
   height: 80%;
   align-content: center;
+  margin-top: 10px;
 }
 
 ul {

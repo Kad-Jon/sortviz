@@ -1,48 +1,44 @@
 import ArrayPointer from "../module/ArrayPointer";
 
-export default async function quicksort(arr) 
-
-
-
-
-	{
-                                       await quickSort(arr, 0, arr.length - 1);
+export default async function quicksort(arr) {
+    await quickSort(arr, 0, arr.length - 1);
+    arr.sorted();
 }
 
 async function quickSort(arr, start, end) {
-  if (start < end) {
-    let partitionIndex = await partition(arr, start, end);
+    if (start < end) {
+        let partitionIndex = await partition(arr, start, end);
 
-    await quickSort(arr, start, partitionIndex - 1);
-    await quickSort(arr, partitionIndex + 1, end);
-  }
+        await quickSort(arr, start, partitionIndex - 1);
+        await quickSort(arr, partitionIndex + 1, end);
+    }
 }
 
 async function partition(arr, start, end) {
-  const pivot = await arr.get(end);
+    const pivot = await arr.get(end);
 
-  // mark pivot element
-  arr.mark(end, "yellow");
+    // mark pivot element
+    arr.mark(end, "yellow");
 
-  // initialize L and R pointers
-  let i = new ArrayPointer(start);
-  let j = new ArrayPointer(start);
+    // initialize L and R pointers
+    let i = new ArrayPointer(start);
+    let j = new ArrayPointer(start);
 
-  arr.trackPointer(i, "green");
+    arr.trackPointer(i, "green");
 
-  // scan for elements smaller than pivot with right pointer and place infront of left pointer, then increment left pointer
-  while (j < end) {
-    if ((await arr.compareToVal(j, pivot)) === -1) {
-      await arr.swap(i, j);
-      i.increment();
+    // scan for elements smaller than pivot with right pointer and place infront of left pointer, then increment left pointer
+    while (j < end) {
+        if ((await arr.compareToVal(j, pivot)) === -1) {
+            await arr.swap(i, j);
+            i.increment();
+        }
+        j.increment();
     }
-    j.increment();
-  }
 
-  arr.untrackPointer(i);
+    arr.untrackPointer(i);
 
-  // unmark pivot and swap with final partition boundary
-  arr.unmarkAll();
-  await arr.swap(i, end);
-  return i;
+    // unmark pivot and swap with final partition boundary
+    arr.unmarkAll();
+    await arr.swap(i, end);
+    return i;
 }

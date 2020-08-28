@@ -1,255 +1,322 @@
 import React, { Component } from "react";
-import "./styles/SortVizApp.css";
-import "bootstrap/dist/css/bootstrap.css";
+
 import Panel from "./Panel";
 import ConfigBanner from "./ConfigBanner";
-import { randomArray } from "../util/arrayGeneration";
+
+import arrayGenerators from "../util/arrayGeneration";
+import sortingAlgorithms from "../algorithms/sortingAlgorithms";
 import ArrayViewController from "../module/ArrayViewController";
-import bubblesort from "../algorithms/bubblesort";
-import insertionsort from "../algorithms/insertionsort";
-import quicksort from "../algorithms/quicksort";
-import mergesort from "../algorithms/mergesort";
-import dualpivotquicksort from "../algorithms/dualpivotquicksort";
-import selectionsort from "../algorithms/selectionsort";
+
+import { shuffleArray } from "../util/sortutil";
+
+import "./styles/SortVizApp.css";
+import "bootstrap/dist/css/bootstrap.css";
 
 class SortVizApp extends Component {
-  constructor() {
-    super();
-    const initialSize = 64;
-    const initialDelay = 35;
-    const initialArray = randomArray(initialSize);
-    const initialColorArray = Array(initialSize).fill("white");
-    const initialSelectedSortType = "bubble";
-    const initialMaxVal = Math.max(...initialArray);
-    this.state = {
-      delay: initialDelay,
-      areSorting: false,
-      arrayviews: [
-        {
-          array: initialArray,
-          colorArray: initialColorArray,
-          selectedSortType: initialSelectedSortType,
-          isSorting: false,
-          arrayAccesses: 0,
-          maxVal: initialMaxVal,
-        },
-      ],
-    };
-  }
-
-  render() {
-    const {
-      onClickSort,
-      onChangeSize,
-      onChangeDelay,
-      onToggleSecondArray,
-    } = this;
-    const { initialSize, initialDelay, areSorting } = this.state;
-
-    return (
-      <div className="SortVizApp container">
-        <div id="title" className="page-header">
-          <h1>Sorting Algorithm Visualizer</h1>
-        </div>
-        <ConfigBanner
-          initialSize={64}
-          initialDelay={35}
-          areSorting={areSorting}
-          onClickSort={onClickSort}
-          onChangeSize={onChangeSize}
-          onChangeDelay={onChangeDelay}
-          onToggleSecondArray={onToggleSecondArray}
-        ></ConfigBanner>
-        <ul>{this.createPanels()}</ul>
-      </div>
-    );
-  }
-
-  createPanels = () => {
-    const setSelectedSortType = this.setSelectedSortType.bind(this);
-    const arrayviews = this.state.arrayviews;
-    const height = 80 / this.state.arrayviews.length + "vh";
-
-    return arrayviews.map((arrayview, index) => {
-      return (
-        <li>
-          <Panel
-            key={index}
-            index={index}
-            height={height}
-            array={arrayview.array}
-            colorArray={arrayview.colorArray}
-            selectedSortType={arrayview.selectedSortType}
-            arrayAccesses={arrayview.arrayAccesses}
-            setSortType={setSelectedSortType}
-          ></Panel>
-        </li>
-      );
-    });
-  };
-
-  onClickSort = async () => {
-    const { arrayviews } = this.state;
-    const callbacks = {
-      getDelay: this.getDelay,
-      setArray: this.setArray,
-      setColorArray: this.setColorArray,
-      setArrayAccesses: this.setArrayAccesses,
-      setIsSorting: this.setIsSorting,
-    };
-
-    this.setState({ areSorting: true });
-
-    arrayviews.forEach(async (arrayview, index) => {
-      const avc = new ArrayViewController(
-        arrayview.array,
-        arrayview.colorArray,
-        index,
-        callbacks
-      );
-      // this.setIsSorting(true, index);
-      switch (arrayview.selectedSortType) {
-        case "bubble":
-          await bubblesort(avc);
-          break;
-        case "insertion":
-          await insertionsort(avc);
-          break;
-        case "selection":
-          await selectionsort(avc);
-          break;
-        case "merge":
-          await mergesort(avc);
-          break;
-        case "quick":
-          await quicksort(avc);
-          break;
-        case "dualpivotquick":
-          await dualpivotquicksort(avc);
-          break;
-        default:
-          break;
-      }
-      await avc.sorted();
-    });
-  };
-
-  getDelay = () => {
-    return this.state.delay;
-  };
-
-  // Config callback functions to configure the sort
-  onChangeSize = (e) => {
-    const shuffledArr = randomArray(e.target.value, 3);
-    const colorArray = Array(parseInt(e.target.value)).fill("white");
-
-    this.setState({ size: e.target.value });
-
-    for (let i = 0; i < this.state.arrayviews.length; i++) {
-      this.setColorArray(colorArray.slice(), i);
-      this.setArray(shuffledArr.slice(), i);
-      this.setArrayAccesses(0, i);
+    constructor() {
+        super();
+        const initialSize = 64;
+        const initialDelay = 35;
+        const initialDataSet = "linear";
+        const initialShuffle = "shuffled";
+        const initialArray = this.generateArray(initialDataSet, initialSize, initialShuffle);
+        const initialColorArray = Array(initialSize).fill("white");
+        const initialSelectedSortType = "bubble";
+        const initialMaxVal = Math.max(...initialArray);
+        this.state = {
+            size: initialSize,
+            dataSet: initialDataSet,
+            shuffle: initialShuffle,
+            delay: initialDelay,
+            areSorting: false,
+            arrayviews: [
+                {
+                    array: initialArray,
+                    colorArray: initialColorArray,
+                    sortType: initialSelectedSortType,
+                    isSorting: false,
+                    arrayAccesses: 0,
+                    dataSet: initialDataSet,
+                    shuffle: initialShuffle,
+                    maxVal: initialMaxVal,
+                },
+            ],
+        };
     }
-  };
 
-  onChangeDelay = (e) => {
-    this.setState({ delay: e.target.value });
-  };
+    // Application is composed of a config banner and a list of panels containing array views
+    // Configuration is supplied at the top level config banner and applies the config to all arrays
+    // But also each panel supplies a config banner for its contained array view (save for delay, which is global)
+    render() {
+        const {
+            onClickSort,
+            onChangeSizes,
+            onChangeDelay,
+            setDataSets,
+            setShuffles,
+            onClickGenerateArrays,
+            onToggleSecondArray,
+        } = this;
+        const { areSorting } = this.state;
+        const sign = this.state.arrayviews.length === 1 ? "ADD" : "REMOVE";
 
-  onToggleSecondArray = () => {
-    if (this.state.arrayviews.length === 1) {
-      const newPanels = this.state.arrayviews;
-      newPanels.push(this.createDefaultPanelObject());
-      this.setState({
-        panels: newPanels,
-      });
-    } else {
-      const newPanels = this.state.arrayviews;
-      newPanels.pop();
-      this.setState({ panels: newPanels });
+        return (
+            <div className="SortVizApp container-fluid">
+                <div id="title" className="page-header">
+                    <h1>Sorting Algorithm Visualizer</h1>
+                </div>
+                <ConfigBanner
+                    initialSize={64}
+                    initialDelay={35}
+                    dataSet={"linear"}
+                    shuffle={"shuffled"}
+                    areSorting={areSorting}
+                    onClickSort={onClickSort}
+                    onChangeSize={onChangeSizes}
+                    onChangeDelay={onChangeDelay}
+                    onClickGenerateArrays={onClickGenerateArrays}
+                    setDataSets={setDataSets}
+                    setShuffles={setShuffles}
+                ></ConfigBanner>
+                <ul>{this.createPanels()}</ul>
+                <button id="arr-toggle-btn" disabled={areSorting} onClick={onToggleSecondArray}>
+                    {sign}
+                </button>
+            </div>
+        );
     }
-  };
 
-  setArray = (array, viewIndex) => {
-    this.setState((state) => ({
-      arrayviews: state.arrayviews.map((arrayview, index) => {
-        if (index === viewIndex) {
-          return { ...arrayview, array: array };
-        } else {
-          return { ...arrayview };
-        }
-      }),
-    }));
-  };
+    createPanels = () => {
+        const setSortType = this.setSortType;
+        const onChangeSortType = this.onChangeSortType;
+        const arrayviews = this.state.arrayviews;
+        const height = 70 / this.state.arrayviews.length + "vh";
 
-  setColorArray = (colorArray, viewIndex) => {
-    this.setState((state) => ({
-      arrayviews: state.arrayviews.map((arrayview, index) => {
-        if (index === viewIndex) {
-          return { ...arrayview, colorArray: colorArray };
-        } else {
-          return { ...arrayview };
-        }
-      }),
-    }));
-  };
-
-  setSelectedSortType = (sortType, viewIndex) => {
-    this.setState((state) => ({
-      arrayviews: state.arrayviews.map((arrayview, index) => {
-        if (index === viewIndex) {
-          return { ...arrayview, selectedSortType: sortType };
-        } else {
-          return { ...arrayview };
-        }
-      }),
-    }));
-  };
-
-  setArrayAccesses = (arrayAccesses, viewIndex) => {
-    this.setState((state) => ({
-      arrayviews: state.arrayviews.map((arrayview, index) => {
-        if (index === viewIndex) {
-          return { ...arrayview, arrayAccesses: arrayAccesses };
-        } else {
-          return { ...arrayview };
-        }
-      }),
-    }));
-  };
-
-  setIsSorting = (isSorting, viewIndex) => {
-    this.setState((state) => ({
-      arrayviews: state.arrayviews.map((arrayview, index) => {
-        if (index === viewIndex) {
-          return { ...arrayview, isSorting: isSorting };
-        } else {
-          return { ...arrayview };
-        }
-      }),
-    }));
-
-    let areStillSorting = false;
-
-    this.state.arrayviews.forEach((arrayview) => {
-      if (arrayview.isSorting === true) {
-        areStillSorting = true;
-      }
-    });
-
-    this.setState({ areSorting: areStillSorting });
-  };
-
-  createDefaultPanelObject = () => {
-    const basearrayview = this.state.arrayviews[0];
-    return {
-      array: basearrayview.array.slice(),
-      colorArray: basearrayview.colorArray.slice(),
-      selectedSortType: basearrayview.selectedSortType,
-      isSorting: false,
-      arrayAccesses: 0,
+        return arrayviews.map((arrayview, index) => {
+            const { array, colorArray, sortType, arrayAccesses, maxVal } = arrayview;
+            return (
+                <li>
+                    <Panel
+                        key={index}
+                        index={index}
+                        maxVal={maxVal}
+                        height={height}
+                        array={array}
+                        colorArray={colorArray}
+                        selectedSortType={sortType}
+                        arrayAccesses={arrayAccesses}
+                        setSortType={setSortType}
+                        onChangeSortType={onChangeSortType(index)}
+                    ></Panel>
+                </li>
+            );
+        });
     };
-  };
+
+    getDelay = () => {
+        return this.state.delay;
+    };
+
+    getArrayViewCallbacks = () => {
+        return {
+            getDelay: this.getDelay,
+            setArray: this.setArray,
+            setColorArray: this.setColorArray,
+            setArrayAccesses: this.setArrayAccesses,
+            setIsSorting: this.setIsSorting,
+        };
+    };
+
+    // Config callback functions to configure the sort
+
+    onClickGenerateArrays = () => {
+        const array = this.generateArray(this.state.dataSet, this.state.size, this.state.shuffle);
+        const colorArray = Array(parseInt(array.length)).fill("white");
+        const maxVal = Math.max(...array);
+
+        for (let i = 0; i < this.state.arrayviews.length; i++) {
+            this.setColorArray(colorArray.slice(), i);
+            this.setArray(array.slice(), i);
+            this.setArrayAccesses(0, i);
+            this.setMaxVal(maxVal, i);
+        }
+    };
+
+    onClickSort = () => {
+        const { arrayviews } = this.state;
+        const callbacks = this.getArrayViewCallbacks();
+
+        this.setState({ areSorting: true });
+
+        arrayviews.forEach((arrayview, index) => {
+            const avc = new ArrayViewController(arrayview.array, arrayview.colorArray, index, callbacks);
+
+            const sortingAlgorithm = sortingAlgorithms[arrayview.sortType];
+            sortingAlgorithm(avc);
+        });
+    };
+
+    onChangeSizes = (e) => {
+        const arr = this.generateArray(this.state.dataSet, e.target.value, this.state.shuffle);
+        const colorArray = Array(parseInt(e.target.value)).fill("white");
+        const maxVal = Math.max(...arr);
+
+        this.setState({ size: e.target.value });
+        for (let i = 0; i < this.state.arrayviews.length; i++) {
+            this.setColorArray(colorArray.slice(), i);
+            this.setArray(arr.slice(), i);
+            this.setArrayAccesses(0, i);
+            this.setMaxVal(maxVal, i);
+        }
+    };
+
+    onChangeDelay = (e) => {
+        this.setState({ delay: e.target.value });
+    };
+
+    onToggleSecondArray = () => {
+        if (this.state.arrayviews.length === 1) {
+            const newPanels = this.state.arrayviews;
+            newPanels.push(this.createDefaultPanelObject());
+            this.setState({
+                panels: newPanels,
+            });
+        } else {
+            const newPanels = this.state.arrayviews;
+            newPanels.pop();
+            this.setState({ panels: newPanels });
+        }
+    };
+
+    onChangeSortType = (index) => {
+        return (e) => {
+            this.setSortType(e.target.value, index);
+        };
+    };
+
+    onChangeSize = (index) => {
+        return (e) => {
+            this.setSize(e.target.value, index);
+        };
+    };
+
+    onChangeShuffle = (index) => {
+        return (e) => {
+            this.setShuffle(e.target.value, index);
+        };
+    };
+
+    onClickGenerateArray = (index) => {
+        return () => {
+            this.refreshArrayView();
+        };
+    };
+
+    setArrayViewProperty = (name, value, viewIndex) => {
+        this.setState((state) => ({
+            arrayviews: state.arrayviews.map((arrayview, index) => {
+                if (index === viewIndex) {
+                    return { ...arrayview, [name]: value };
+                } else {
+                    return { ...arrayview };
+                }
+            }),
+        }));
+    };
+
+    setArrayViewProperties = (name, value) => {
+        this.setState((state) => ({
+            arrayviews: state.arrayviews.map((arrayview) => {
+                return { ...arrayview, [name]: value };
+            }),
+        }));
+    };
+
+    setArray = (array, viewIndex) => {
+        this.setArrayViewProperty("array", array, viewIndex);
+    };
+
+    setColorArray = (colorArray, viewIndex) => {
+        this.setArrayViewProperty("colorArray", colorArray, viewIndex);
+    };
+
+    setSortType = (sortType, viewIndex) => {
+        this.setArrayViewProperty("sortType", sortType, viewIndex);
+    };
+
+    setDataSet = (dataSet, viewIndex) => {
+        this.setArrayViewProperty("dataSet", dataSet, viewIndex);
+    };
+
+    setDataSets = (dataSet) => {
+        this.setArrayViewProperties("dataSet", dataSet);
+        this.setState({ dataSet: dataSet });
+    };
+
+    setShuffle = (shuffle, viewIndex) => {
+        this.setArrayViewProperty("shuffle", shuffle, viewIndex);
+    };
+
+    setShuffles = (shuffle) => {
+        this.setArrayViewProperties("shuffle", shuffle);
+        this.setState({ shuffle: shuffle });
+    };
+
+    setArrayAccesses = (arrayAccesses, viewIndex) => {
+        this.setArrayViewProperty("arrayAccesses", arrayAccesses, viewIndex);
+    };
+
+    setMaxVal = (maxVal, viewIndex) => {
+        this.setArrayViewProperty("maxVal", maxVal, viewIndex);
+    };
+
+    setIsSorting = (isSorting, viewIndex) => {
+        this.setArrayViewProperty("isSorting", isSorting, viewIndex);
+
+        let areStillSorting = false;
+
+        this.state.arrayviews.forEach((arrayview) => {
+            if (arrayview.isSorting === true) {
+                areStillSorting = true;
+            }
+        });
+
+        this.setState({ areSorting: areStillSorting });
+    };
+
+    generateArray(dataSet, size, shuffle) {
+        const generatorResult = arrayGenerators[dataSet];
+        const arr = generatorResult(size);
+
+        switch (shuffle) {
+            case "shuffled":
+                shuffleArray(arr);
+                break;
+            case "reversed":
+                arr.sort((a, b) => b - a);
+                break;
+            case "sorted":
+                arr.sort((a, b) => a - b);
+                break;
+            default:
+                break;
+        }
+        return arr;
+    }
+    // TODO: properly copy arrayview object
+    createDefaultPanelObject = () => {
+        const basearrayview = this.state.arrayviews[0];
+        return {
+            array: basearrayview.array.slice(),
+            colorArray: basearrayview.colorArray.slice(),
+            dataSet: basearrayview.dataSet,
+            maxVal: basearrayview.maxVal,
+            shuffle: basearrayview.shuffle,
+            sortType: basearrayview.sortType,
+            isSorting: false,
+            arrayAccesses: 0,
+        };
+    };
 }
 
 export default SortVizApp;
