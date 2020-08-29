@@ -26,6 +26,9 @@ class SortTypeDropDown extends Component {
                     <option value="dualpivotquick" selected={"dualpivotquick" === selectedSortType}>
                         Quick (dual pivot)
                     </option>
+                    <option value="randomizedquick" selected={"randomizedquick" === selectedSortType}>
+                        Quick (randomized)
+                    </option>
                 </select>
             </form>
         );
