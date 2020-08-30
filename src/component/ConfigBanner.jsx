@@ -28,9 +28,10 @@ function ConfigBanner(props) {
                         disabled={areSorting}
                     ></input>
                     <DataSetDropDown dataSet={props.dataSet} setDataSets={props.setDataSets}></DataSetDropDown>
-                    <ShuffleDropDown shuffle={props.shuffle} setShuffle={props.setShuffles}></ShuffleDropDown>
-
-                    <button onClick={onClickGenerateArrays}>Generate</button>
+                    <ShuffleDropDown shuffle={props.shuffle} setShuffles={props.setShuffles}></ShuffleDropDown>
+                    <button onClick={onClickGenerateArrays} disabled={areSorting}>
+                        Generate
+                    </button>
                 </div>
                 <div className="col-3 sort-controls">
                     <button id="sort-btn" onClick={onClickSort} disabled={areSorting}>

@@ -3,10 +3,10 @@ import ReactDOM from "react-dom";
 
 class SortTypeDropDown extends Component {
     render() {
-        const { selectedSortType, isSorting, index, onChangeSortType } = this.props;
+        const { selectedSortType, areSorting, index, onChangeSortType } = this.props;
 
         return (
-            <form disabled={isSorting} onChange={onChangeSortType}>
+            <form disabled={areSorting} onChange={onChangeSortType}>
                 <select name={"sort-drp-down-" + index}>
                     <option value="bubble" selected={"bubble" === selectedSortType}>
                         Bubble

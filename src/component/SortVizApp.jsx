@@ -117,7 +117,7 @@ class SortVizApp extends Component {
         return this.state.delay;
     };
 
-    getArrayViewCallbacks = () => {
+    getArrayViewCallbacks = (i) => {
         return {
             getDelay: this.getDelay,
             setArray: this.setArray,
@@ -144,11 +144,12 @@ class SortVizApp extends Component {
 
     onClickSort = () => {
         const { arrayviews } = this.state;
-        const callbacks = this.getArrayViewCallbacks();
 
         this.setState({ areSorting: true });
 
         arrayviews.forEach((arrayview, index) => {
+            const callbacks = this.getArrayViewCallbacks();
+            this.setArrayViewProperty("isSorting", true, index);
             const avc = new ArrayViewController(arrayview.array, arrayview.colorArray, index, callbacks);
 
             const sortingAlgorithm = sortingAlgorithms[arrayview.sortType];
@@ -176,15 +177,15 @@ class SortVizApp extends Component {
 
     onToggleSecondArray = () => {
         if (this.state.arrayviews.length === 1) {
-            const newPanels = this.state.arrayviews;
-            newPanels.push(this.createDefaultPanelObject());
+            const newArrayViews = this.state.arrayviews;
+            newArrayViews.push(this.createDefaultArrayView());
             this.setState({
-                panels: newPanels,
+                arrayviews: newArrayViews,
             });
         } else {
             const newPanels = this.state.arrayviews;
             newPanels.pop();
-            this.setState({ panels: newPanels });
+            this.setState({ arrayviews: newPanels });
         }
     };
 
@@ -203,12 +204,6 @@ class SortVizApp extends Component {
     onChangeShuffle = (index) => {
         return (e) => {
             this.setShuffle(e.target.value, index);
-        };
-    };
-
-    onClickGenerateArray = (index) => {
-        return () => {
-            this.refreshArrayView();
         };
     };
 
@@ -273,13 +268,7 @@ class SortVizApp extends Component {
     setIsSorting = (isSorting, viewIndex) => {
         this.setArrayViewProperty("isSorting", isSorting, viewIndex);
 
-        let areStillSorting = false;
-
-        this.state.arrayviews.forEach((arrayview) => {
-            if (arrayview.isSorting === true) {
-                areStillSorting = true;
-            }
-        });
+        const areStillSorting = this.state.arrayviews.some((arrayview) => arrayview.isSorting);
 
         this.setState({ areSorting: areStillSorting });
     };
@@ -303,8 +292,8 @@ class SortVizApp extends Component {
         }
         return arr;
     }
-    // TODO: properly copy arrayview object
-    createDefaultPanelObject = () => {
+
+    createDefaultArrayView = () => {
         const basearrayview = this.state.arrayviews[0];
         return {
             array: basearrayview.array.slice(),

@@ -2,21 +2,11 @@ import React, { Component } from "react";
 import ReactDOM from "react-dom";
 
 class ShuffleDropDown extends Component {
-    componentDidMount() {
-        const domNode = ReactDOM.findDOMNode(this);
-
-        if (this.props.setShuffle) {
-            domNode.addEventListener("change", (e) => this.props.setShuffle(e.target.value, this.props.index));
-        } else {
-            domNode.addEventListener("change", (e) => this.props.setShuffles(e.target.value));
-        }
-    }
-
     render() {
-        const { shuffle, isSorting, index } = this.props;
+        const { shuffle, setShuffles, index } = this.props;
 
         return (
-            <form disabled={isSorting}>
+            <form onChange={setShuffles}>
                 <select name={"data-set-drp-down" + index}>
                     <option value="shuffled" selected={"shuffled" === shuffle}>
                         Shuffled

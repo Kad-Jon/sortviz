@@ -13,10 +13,10 @@ class DataSetDropDown extends Component {
     }
 
     render() {
-        const { dataSet, isSorting, index } = this.props;
+        const { dataSet, areSorting, index } = this.props;
 
         return (
-            <form disabled={isSorting}>
+            <form disabled={areSorting}>
                 <select name={"data-set-drp-down" + index}>
                     <option value="random" selected={"random" === dataSet}>
                         Random
