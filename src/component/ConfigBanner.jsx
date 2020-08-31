@@ -12,6 +12,7 @@ function ConfigBanner(props) {
         onChangeSize,
         onChangeDelay,
         onClickGenerateArrays,
+        onChangeShuffles,
     } = props;
     return (
         <div className="ConfigBanner container-fluid">
@@ -28,7 +29,7 @@ function ConfigBanner(props) {
                         disabled={areSorting}
                     ></input>
                     <DataSetDropDown dataSet={props.dataSet} setDataSets={props.setDataSets}></DataSetDropDown>
-                    <ShuffleDropDown shuffle={props.shuffle} setShuffles={props.setShuffles}></ShuffleDropDown>
+                    <ShuffleDropDown shuffle={props.shuffle} onChangeShuffles={onChangeShuffles}></ShuffleDropDown>
                     <button onClick={onClickGenerateArrays} disabled={areSorting}>
                         Generate
                     </button>

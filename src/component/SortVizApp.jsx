@@ -53,7 +53,7 @@ class SortVizApp extends Component {
             onChangeSizes,
             onChangeDelay,
             setDataSets,
-            setShuffles,
+            onChangeShuffles,
             onClickGenerateArrays,
             onToggleSecondArray,
         } = this;
@@ -76,7 +76,7 @@ class SortVizApp extends Component {
                     onChangeDelay={onChangeDelay}
                     onClickGenerateArrays={onClickGenerateArrays}
                     setDataSets={setDataSets}
-                    setShuffles={setShuffles}
+                    onChangeShuffles={onChangeShuffles}
                 ></ConfigBanner>
                 <ul>{this.createPanels()}</ul>
                 <button id="arr-toggle-btn" disabled={areSorting} onClick={onToggleSecondArray}>
@@ -201,10 +201,8 @@ class SortVizApp extends Component {
         };
     };
 
-    onChangeShuffle = (index) => {
-        return (e) => {
-            this.setShuffle(e.target.value, index);
-        };
+    onChangeShuffles = (e) => {
+        this.setShuffles(e.target.value);
     };
 
     setArrayViewProperty = (name, value, viewIndex) => {
